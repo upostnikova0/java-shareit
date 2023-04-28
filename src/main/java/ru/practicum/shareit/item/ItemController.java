@@ -13,7 +13,7 @@ import java.util.Collection;
 @Slf4j
 public class ItemController {
     private final ItemServiceImpl itemService;
-    private final String X_SHARER = "X-Sharer-User-Id";
+    private final String xSharerUserId = "X-Sharer-User-Id";
 
     @Autowired
     public ItemController(ItemServiceImpl itemServiceImpl) {
@@ -21,7 +21,7 @@ public class ItemController {
     }
 
     @PostMapping
-    public Item createItem(@RequestHeader(X_SHARER) long userId, @RequestBody ItemDto itemDto) {
+    public Item createItem(@RequestHeader(xSharerUserId) long userId, @RequestBody ItemDto itemDto) {
         return itemService.create(userId, itemDto);
     }
 
@@ -31,12 +31,12 @@ public class ItemController {
     }
 
     @GetMapping
-    public Collection<Item> getItemsByUser(@RequestHeader(X_SHARER) long userId) {
+    public Collection<Item> getItemsByUser(@RequestHeader(xSharerUserId) long userId) {
         return itemService.getItemsByUser(userId);
     }
 
     @PatchMapping("/{id}")
-    public Item updateItem(@RequestHeader(X_SHARER) long userId,
+    public Item updateItem(@RequestHeader(xSharerUserId) long userId,
                            @RequestBody Item item,
                            @PathVariable("id") long itemId
     ) {
