@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @AllArgsConstructor
 public class ItemDto {
-    private Long Id;
+    private Long id;
     @NotBlank(message = "Название не может быть пустым")
     private String name;
     @NotBlank(message = "Описание не может быть пустым")

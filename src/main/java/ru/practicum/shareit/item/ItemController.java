@@ -13,7 +13,7 @@ import java.util.Collection;
 @Slf4j
 public class ItemController {
     private final ItemServiceImpl itemService;
-    private final static String X_SHARER = "X-Sharer-User-Id";
+    private final String X_SHARER = "X-Sharer-User-Id";
 
     @Autowired
     public ItemController(ItemServiceImpl itemServiceImpl) {
