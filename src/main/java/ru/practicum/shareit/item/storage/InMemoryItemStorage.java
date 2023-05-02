@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -38,6 +38,11 @@ public class InMemoryItemStorage implements ItemStorage {
                 .stream()
                 .filter(x -> x.getOwner().getId().equals(userId))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<Item> findAll() {
+        return items.values();
     }
 
     @Override

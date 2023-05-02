@@ -2,9 +2,11 @@ package ru.practicum.shareit.item;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.model.ItemDto;
+import ru.practicum.shareit.item.service.ItemService;
 
 import java.util.Collection;
 
@@ -12,35 +14,35 @@ import java.util.Collection;
 @RequestMapping(path = "/items")
 @Slf4j
 public class ItemController {
-    private final ItemServiceImpl itemService;
+    private final ItemService itemService;
     private final String xSharerUserId = "X-Sharer-User-Id";
 
     @Autowired
-    public ItemController(ItemServiceImpl itemServiceImpl) {
-        this.itemService = itemServiceImpl;
+    public ItemController(ItemService itemService) {
+        this.itemService = itemService;
     }
 
     @PostMapping
-    public Item createItem(@RequestHeader(xSharerUserId) long userId, @RequestBody ItemDto itemDto) {
-        return itemService.create(userId, itemDto);
+    public ResponseEntity<ItemDto> createItem(@RequestHeader(xSharerUserId) long userId, @RequestBody ItemDto itemDto) {
+        return new ResponseEntity<>(itemService.create(userId, itemDto), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public Item getItemById(@PathVariable("id") long itemId) {
-        return itemService.getItem(itemId);
+    public ResponseEntity<ItemDto> getItemById(@PathVariable("id") long itemId) {
+        return new ResponseEntity<>(itemService.getItem(itemId), HttpStatus.OK);
     }
 
     @GetMapping
-    public Collection<Item> getItemsByUser(@RequestHeader(xSharerUserId) long userId) {
-        return itemService.getItemsByUser(userId);
+    public ResponseEntity<Collection<ItemDto>> getItemsByUser(@RequestHeader(xSharerUserId) long userId) {
+        return new ResponseEntity<>(itemService.getItemsByUser(userId), HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
-    public Item updateItem(@RequestHeader(xSharerUserId) long userId,
-                           @RequestBody Item item,
-                           @PathVariable("id") long itemId
+    public ResponseEntity<ItemDto> updateItem(@RequestHeader(xSharerUserId) long userId,
+                                              @RequestBody ItemDto itemDto,
+                                              @PathVariable("id") long itemId
     ) {
-        return itemService.update(userId, item, itemId);
+        return new ResponseEntity<>(itemService.update(userId, itemDto, itemId), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -49,7 +51,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public Collection<Item> searchItems(@RequestParam(value = "text") String text) {
-        return itemService.searchItems(text);
+    public ResponseEntity<Collection<ItemDto>> searchItems(@RequestParam(value = "text") String text) {
+        return new ResponseEntity<>(itemService.searchItems(text), HttpStatus.OK);
     }
 }

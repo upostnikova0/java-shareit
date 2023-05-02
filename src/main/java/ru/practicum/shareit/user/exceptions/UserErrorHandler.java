@@ -1,10 +1,12 @@
 package ru.practicum.shareit.user.exceptions;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.validation.ValidationException;
 import java.util.Map;
 
 @RestControllerAdvice
@@ -17,7 +19,7 @@ public class UserErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationException(final UserValidationException e) {
+    public Map<String, String> handleUserValidationException(final ValidationException e) {
         return Map.of("Incorrect data", e.getMessage());
     }
 
@@ -28,8 +30,8 @@ public class UserErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleThrowable(final Throwable e) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         return Map.of("Incorrect data", e.getMessage());
     }
 }

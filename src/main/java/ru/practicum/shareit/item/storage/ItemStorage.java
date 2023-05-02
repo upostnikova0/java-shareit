@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.storage;
 
 import ru.practicum.shareit.item.model.Item;
 
@@ -11,6 +11,8 @@ public interface ItemStorage {
     Item findItem(long itemId);
 
     Collection<Item> findAllItemsByUser(long userId);
+
+    Collection<Item> findAll();
 
     Item update(Item item);
 

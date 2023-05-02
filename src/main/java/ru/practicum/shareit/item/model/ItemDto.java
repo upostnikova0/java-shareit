@@ -1,10 +1,10 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.item.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.practicum.shareit.user.User;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
 @AllArgsConstructor
@@ -14,6 +14,6 @@ public class ItemDto {
     private String name;
     @NotBlank(message = "Описание не может быть пустым")
     private String description;
-    private User owner;
+    @NotNull(message = "Не указан статус вещи.")
     private Boolean available;
 }
