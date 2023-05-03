@@ -16,19 +16,15 @@ import java.util.Collection;
 @RequestMapping(path = "/users")
 public class UserController {
     private final UserService userService;
-    private final Create create;
-    private final Update update;
 
     @Autowired
-    public UserController(UserService userService, Create create, Update update) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.create = create;
-        this.update = update;
     }
 
     @PostMapping
     public ResponseEntity<UserDto> create(@RequestBody @Validated(Create.class) UserDto userDto) {
-        return new ResponseEntity<>(create.create(userDto), HttpStatus.OK);
+        return new ResponseEntity<>(userService.create(userDto), HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
@@ -43,7 +39,7 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<UserDto> update(@RequestBody @Validated(Update.class) UserDto userDto, @PathVariable long id) {
-        return new ResponseEntity<>(update.update(userDto, id), HttpStatus.OK);
+        return new ResponseEntity<>(userService.update(userDto, id), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
