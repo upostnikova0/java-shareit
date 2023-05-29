@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.Create;
 import ru.practicum.shareit.user.service.Update;
 import ru.practicum.shareit.user.service.UserService;

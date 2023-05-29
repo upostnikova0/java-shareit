@@ -1,9 +1,9 @@
-package ru.practicum.shareit.item.comment;
+package ru.practicum.shareit.item.comment.model;
 
 import lombok.*;
 import lombok.experimental.NonFinal;
-import ru.practicum.shareit.item.Item;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;

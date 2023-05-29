@@ -1,10 +1,13 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
+import ru.practicum.shareit.booking.model.Booking;
 
+@Component
 public class BookingMapper {
-    public static BookingDto toBookingDto(Booking booking) {
+    public BookingDto toBookingDto(Booking booking) {
         return BookingDto.builder()
                 .id(booking.getId())
                 .start(booking.getStart())
@@ -15,7 +18,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public static Booking toBooking(BookingDto bookingDto) {
+    public Booking toBooking(BookingDto bookingDto) {
         return Booking.builder()
                 .id(bookingDto.getId())
                 .start(bookingDto.getStart())
@@ -26,7 +29,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public static Booking toBooking(BookingShortDto bookingShortDto) {
+    public Booking toBooking(BookingShortDto bookingShortDto) {
         return Booking.builder()
                 .id(bookingShortDto.getId())
                 .start(bookingShortDto.getStart())
@@ -34,7 +37,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public static BookingShortDto toBookingShortDto(Booking booking) {
+    public BookingShortDto toBookingShortDto(Booking booking) {
         return BookingShortDto.builder()
                 .id(booking.getId())
                 .start(booking.getStart())

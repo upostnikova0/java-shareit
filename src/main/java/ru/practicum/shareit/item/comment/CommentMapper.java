@@ -1,7 +1,12 @@
 package ru.practicum.shareit.item.comment;
 
+import org.springframework.stereotype.Component;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
+import ru.practicum.shareit.item.comment.model.Comment;
+
+@Component
 public class CommentMapper {
-    public static Comment toComment(CommentDto commentDto) {
+    public Comment toComment(CommentDto commentDto) {
         return Comment.builder()
                 .id(commentDto.getId())
                 .text(commentDto.getText())
@@ -9,7 +14,7 @@ public class CommentMapper {
                 .build();
     }
 
-    public static CommentDto toCommentDto(Comment comment) {
+    public CommentDto toCommentDto(Comment comment) {
         return CommentDto.builder()
                 .id(comment.getId())
                 .text(comment.getText())

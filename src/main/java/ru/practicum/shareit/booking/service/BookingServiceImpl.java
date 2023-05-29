@@ -1,16 +1,22 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.State;
+import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.exception.BadRequestException;
 import ru.practicum.shareit.booking.exception.BookingNotFoundException;
-import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.ValidationException;
@@ -21,10 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.booking.BookingMapper.toBooking;
-import static ru.practicum.shareit.booking.BookingMapper.toBookingDto;
 import static ru.practicum.shareit.booking.Status.*;
-import static ru.practicum.shareit.user.UserMapper.toUser;
 
 @Service
 @Slf4j
@@ -32,19 +35,25 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserService userService;
     private final ItemRepository itemRepository;
+    private final BookingMapper bookingMapper;
+    private final UserMapper userMapper;
 
     public BookingServiceImpl(@Qualifier("bookingRepository") BookingRepository bookingRepository,
                               UserService userService,
-                              @Qualifier("itemRepository") ItemRepository itemRepository) {
+                              @Qualifier("itemRepository") ItemRepository itemRepository,
+                              BookingMapper bookingMapper,
+                              UserMapper userMapper) {
         this.bookingRepository = bookingRepository;
         this.userService = userService;
         this.itemRepository = itemRepository;
+        this.bookingMapper = bookingMapper;
+        this.userMapper = userMapper;
     }
 
     @Transactional
     @Override
     public BookingDto create(Long userId, BookingDto bookingDto) {
-        User booker = toUser(userService.getUser(userId));
+        User booker = userMapper.toUser(userService.getUser(userId));
         isBookingValid(bookingDto);
         Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(
                 () -> new ItemNotFoundException(String.format("Вещь с ID %d не найдена.", bookingDto.getItemId()))
@@ -55,21 +64,21 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingNotFoundException("Нельзя забронировать собственную вещь.");
         }
 
-        Booking booking = toBooking(bookingDto);
+        Booking booking = bookingMapper.toBooking(bookingDto);
         booking.setBooker(booker);
         booking.setItem(item);
         booking.setStatus(WAITING);
         bookingRepository.save(booking);
 
         log.info(String.format("Новое бронирование в базе: id # %d.", booking.getId()));
-        return toBookingDto(booking);
+        return bookingMapper.toBookingDto(booking);
     }
 
     @Transactional
     @Override
     public BookingDto updateBookingStatus(Long userId, Long id, Boolean approved) {
         userService.getUser(userId);
-        Booking booking = BookingMapper.toBooking(getById(userId, id));
+        Booking booking = bookingMapper.toBooking(getById(userId, id));
 
         if (userId.equals(booking.getItem().getOwner().getId())) {
             if (approved) {
@@ -90,13 +99,13 @@ public class BookingServiceImpl implements BookingService {
         }
 
         bookingRepository.save(booking);
-        return toBookingDto(booking);
+        return bookingMapper.toBookingDto(booking);
     }
 
     @Transactional(readOnly = true)
     @Override
     public BookingDto getById(Long userId, Long id) {
-        User user = toUser(userService.getUser(userId));
+        User user = userMapper.toUser(userService.getUser(userId));
         Optional<Booking> bookingOptional = bookingRepository.findById(id);
 
         if (bookingOptional.isPresent()) {
@@ -104,7 +113,7 @@ public class BookingServiceImpl implements BookingService {
 
             if ((user.getId().equals(booking.getBooker().getId())) || (user.getId().equals(booking.getItem().getOwner().getId()))) {
                 log.info("Найдено бронирование {}", bookingOptional.get());
-                return toBookingDto(booking);
+                return bookingMapper.toBookingDto(booking);
             } else {
                 log.warn("Информация доступна только владельцу вещи и арендатору.");
                 throw new BookingNotFoundException("Информация доступна только владельцу вещи и арендатору.");
@@ -117,7 +126,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     @Override
     public Collection<BookingDto> getAllBookingsByUser(Long userId, State state) {
-        User user = toUser(userService.getUser(userId));
+        User user = userMapper.toUser(userService.getUser(userId));
         List<Booking> allBookings = new ArrayList<>();
 
         switch (state) {
@@ -145,14 +154,14 @@ public class BookingServiceImpl implements BookingService {
 
         return allBookings
                 .stream()
-                .map(BookingMapper::toBookingDto)
+                .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     @Override
     public Collection<BookingDto> getAllBookingsByOwner(Long userId, State state) {
-        User user = toUser(userService.getUser(userId));
+        User user = userMapper.toUser(userService.getUser(userId));
         List<Booking> allBookings = new ArrayList<>();
 
         switch (state) {
@@ -179,7 +188,7 @@ public class BookingServiceImpl implements BookingService {
         }
         return allBookings
                 .stream()
-                .map(BookingMapper::toBookingDto)
+                .map(bookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
 
