@@ -2,61 +2,62 @@ package ru.practicum.shareit.user.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserDto;
+import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.exceptions.EmailAlreadyExistException;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.model.UserDto;
-import ru.practicum.shareit.user.model.UserMapper;
-import ru.practicum.shareit.user.storage.UserStorage;
+import ru.practicum.shareit.user.exceptions.UserNotFoundException;
 
-import javax.validation.ValidationException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class UserServiceImpl implements UserService, Create, Update {
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
-    public UserServiceImpl(@Qualifier("inMemoryUserStorage") UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserServiceImpl(@Qualifier("userRepository") UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     @Override
     public UserDto create(UserDto userDto) {
-        isBodyValid(userDto);
-        if (!userStorage.isEmailExists(userDto.getEmail())) {
-            User newUser = userStorage.add(UserMapper.toUser(userDto));
-            log.info("Пользователь {} успешно добавлен", newUser);
-            return UserMapper.toUserDto(newUser);
+        User newUser = userRepository.save(UserMapper.toUser(userDto));
+        log.info("Добавлен пользователь {}.", newUser);
+        return UserMapper.toUserDto(newUser);
+    }
+
+    @Override
+    public UserDto getUser(Long userId) {
+        Optional<User> foundUser = userRepository.findById(userId);
+        if (foundUser.isPresent()) {
+            log.info("Найден пользователь {}", foundUser.get());
+            return UserMapper.toUserDto(foundUser.get());
         } else {
-            log.warn("Не удалось добавить пользователя.");
-            throw new EmailAlreadyExistException("Пользователь с таким email уже существует.");
+            log.warn(String.format("Не найден пользователь с ID %d.", userId));
+            throw new UserNotFoundException(String.format("Не найден пользователь с ID %d.", userId));
         }
     }
 
     @Override
-    public UserDto getUser(long userId) {
-        return UserMapper.toUserDto(userStorage.find(userId));
-    }
-
-    @Override
     public Collection<UserDto> getAll() {
-        return userStorage.findAll()
+        return userRepository.findAll()
                 .stream()
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public UserDto update(UserDto userDto, long userId) {
-        User foundUser = userStorage.find(userId);
+    public UserDto update(UserDto userDto, Long userId) {
+        User foundUser = UserMapper.toUser(getUser(userId));
         String email = userDto.getEmail();
 
         if (email != null) {
-            if (!email.equals(foundUser.getEmail()) && userStorage.isEmailExists(email)) {
-                log.warn("Невозможно добавить пользователя из-за существующего email: {}", email);
+            if (!email.equals(foundUser.getEmail()) && userRepository.findByEmailEquals(email).isPresent()) {
+                log.warn("Невозможно обновить пользователя из-за существующего email: {}", email);
                 throw new EmailAlreadyExistException("Пользователь с таким email уже существует.");
             }
         } else {
@@ -68,32 +69,16 @@ public class UserServiceImpl implements UserService, Create, Update {
             userDto.setName(foundUser.getName());
         }
 
-        userStorage.update(UserMapper.toUser(userDto));
-        log.info("Пользователь {} успешно обновлен", userDto);
+        userRepository.save(UserMapper.toUser(userDto));
+        log.info("Обновлен пользователь {}", userDto);
         return userDto;
     }
 
     @Override
-    public void delete(long userId) {
-        User user = userStorage.find(userId);
-        log.info("Пользователь {} успешно удален.", user);
-        userStorage.remove(user);
-    }
+    public void delete(Long userId) {
+        User user = UserMapper.toUser(getUser(userId));
 
-    private void isBodyValid(UserDto userDto) {
-        String email = userDto.getEmail();
-        String name = userDto.getName();
-
-        if (email == null || email.isEmpty() || email.isBlank() || !email.contains("@")) {
-            log.warn("Поле email пустое или не содержит символ @.");
-            throw new ValidationException("Электронная почта не может быть пустой и должна содержать символ @.");
-        }
-
-        if (name == null || name.isBlank()) {
-            log.warn("Поле name пустое или содержит пробелы.");
-            throw new ValidationException("Имя не может быть пустым и содержать пробелы.");
-        }
-
-        ResponseEntity.ok("valid");
+        log.info("Удален пользователь {}", user);
+        userRepository.deleteById(user.getId());
     }
 }
