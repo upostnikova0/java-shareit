@@ -1,5 +1,6 @@
-package ru.practicum.shareit.user.exceptions;
+package ru.practicum.shareit.user.exception;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,6 +12,12 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class UserErrorHandler {
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorResponse handleOtherErrorsException(final ConstraintViolationException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleEmailAlreadyExistException(final EmailAlreadyExistException e) {
