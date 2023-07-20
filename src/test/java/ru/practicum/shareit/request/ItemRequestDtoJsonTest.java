@@ -10,7 +10,7 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-class ItemRequestDtoJsonTests {
+class ItemRequestDtoJsonTest {
     @Autowired
     JacksonTester<ItemRequestDto> json;
 

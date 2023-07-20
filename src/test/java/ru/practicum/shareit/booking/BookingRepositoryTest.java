@@ -21,7 +21,7 @@ import static ru.practicum.shareit.booking.Status.WAITING;
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class BookingRepositoryTests {
+class BookingRepositoryTest {
     @Autowired
     private BookingRepository bookingRepository;
     @Autowired
