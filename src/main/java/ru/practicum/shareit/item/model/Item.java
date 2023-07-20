@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -28,13 +28,12 @@ public class Item {
     private String description;
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "owner_id", nullable = false)
+    @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false)
     private User owner;
     @NotNull
     @Column(name = "is_available", nullable = false)
     private Boolean available;
-    @Transient
     @OneToOne
-    @JoinColumn(name = "request_id")
+    @JoinColumn(name = "request_id", referencedColumnName = "id")
     ItemRequest request;
 }

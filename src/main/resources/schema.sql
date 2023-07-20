@@ -1,4 +1,4 @@
---DROP TABLE IF EXISTS users, items, requests, bookings, comments CASCADE;
+DROP TABLE IF EXISTS users, items, requests, bookings, comments CASCADE;
 
 CREATE TABLE IF NOT EXISTS users (
     id BIGINT GENERATED ALWAYS AS IDENTITY NOT NULL,
