@@ -103,20 +103,6 @@ class BookingControllerTest {
         assertThrows(ValidationException.class, () -> bookingController.create(user1.getId(), bookingDto));
     }
 
-//    @Test
-//    void approveTest() {
-//        UserDto user = userController.create(userDto);
-//        ItemDto item = itemController.create(user.getId(), itemDto);
-//        UserDto user1 = userController.create(userDto1);
-//        BookingDto booking = bookingController.create(user1.getId(), BookingDto.builder()
-//                .start(LocalDateTime.of(2022, 10, 24, 12, 30))
-//                .end(LocalDateTime.of(2022, 11, 10, 13, 0))
-//                .itemId(item.getId()).build());
-//        assertEquals(Status.WAITING, bookingController.getById(booking.getId(), user1.getId()).getStatus());
-//        bookingController.updateBookingStatus(booking.getId(), user.getId(), true);
-//        assertEquals(Status.APPROVED, bookingController.getById(booking.getId(), user1.getId()).getStatus());
-//    }
-
     @Test
     void updateBookingStatus_shouldReturnExceptionWhenWrongUserId() {
         assertThrows(UserNotFoundException.class, () -> bookingController.updateBookingStatus(1L, 1L, true));

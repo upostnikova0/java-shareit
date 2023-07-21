@@ -25,23 +25,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserControllerTestWithMock {
     @Autowired
     private ObjectMapper mapper;
-
     @MockBean
     private UserService userService;
-
     @Autowired
     private MockMvc mvc;
-
     private UserDto userDto;
 
     @BeforeEach
     void init() {
-        userDto = UserDto
-                .builder()
+        userDto = UserDto.builder()
                 .id(1L)
                 .name("user name")
-                .email("user@email.com")
-                .build();
+                .email("user@email.com").build();
     }
 
     @Test

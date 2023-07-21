@@ -10,18 +10,18 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-class ItemDtoJsonTests {
+class ItemDtoJsonTest {
     @Autowired
     JacksonTester<ItemDto> json;
 
     @Test
-    void testItemDto() throws Exception {
+    void itemDto() throws Exception {
         ItemDto itemDto = ItemDto
                 .builder()
                 .id(1L)
                 .name("item")
-                .available(true)
                 .description("descriptionOfItem")
+                .available(true)
                 .build();
 
         JsonContent<ItemDto> result = json.write(itemDto);

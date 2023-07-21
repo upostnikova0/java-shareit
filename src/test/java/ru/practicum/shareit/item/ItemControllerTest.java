@@ -28,35 +28,28 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ItemControllerTest {
     @Autowired
     private ItemController itemController;
-
     @Autowired
     private UserController userController;
-
     @Autowired
     private BookingController bookingController;
-
     @Autowired
     private ItemRequestController itemRequestController;
-
     private ItemDto itemDto;
-
     private UserDto userDto;
-
     private ItemRequestDto itemRequestDto;
-
     private CommentDto comment;
 
     @BeforeEach
     void init() {
+        userDto = UserDto.builder()
+                .name("name")
+                .email("user@email.com")
+                .build();
+
         itemDto = ItemDto.builder()
                 .name("name")
                 .description("description")
                 .available(true)
-                .build();
-
-        userDto = UserDto.builder()
-                .name("name")
-                .email("user@email.com")
                 .build();
 
         itemRequestDto = ItemRequestDto
@@ -71,37 +64,37 @@ class ItemControllerTest {
     }
 
     @Test
-    void createTest() {
+    void create_shouldReturnValidId() {
         UserDto user = userController.create(userDto);
         ItemDto item = itemController.create(1L, itemDto);
         assertEquals(item.getId(), itemController.getById(item.getId(), user.getId()).getId());
     }
 
     @Test
-    void createWithRequestTest() {
+    void create_shouldReturnValidItem() {
         UserDto user = userController.create(userDto);
-        ItemRequestDto itemRequest = itemRequestController.create(user.getId(), itemRequestDto);
+        itemRequestController.create(user.getId(), itemRequestDto);
         itemDto.setRequestId(1L);
-        UserDto user2 = userController.create(userDto.toBuilder().email("user2@email.com").build());
+        userController.create(userDto.toBuilder().email("user2@email.com").build());
         ItemDto item = itemController.create(2L, itemDto);
         item.setComments(new ArrayList<>());
         assertEquals(item, itemController.getById(1L, 2L));
     }
 
     @Test
-    void createByWrongUser() {
+    void create_shouldReturnExceptionWhenInvalidUserId() {
         assertThrows(UserNotFoundException.class, () -> itemController.create(1L, itemDto));
     }
 
     @Test
-    void createWithWrongItemRequest() {
+    void create_shouldReturnExceptionWhenInvalidItemId() {
         itemDto.setRequestId(10L);
-        UserDto user = userController.create(userDto);
+        userController.create(userDto);
         assertThrows(ItemNotFoundException.class, () -> itemController.create(1L, itemDto));
     }
 
     @Test
-    void updateTest() {
+    void update_shouldReturnValidDescription() {
         userController.create(userDto);
         itemController.create(1L, itemDto);
         ItemDto item = itemDto.toBuilder().name("new name").description("updateDescription").available(false).build();
@@ -110,12 +103,12 @@ class ItemControllerTest {
     }
 
     @Test
-    void updateForWrongItemTest() {
+    void update_shouldReturnExceptionWhenInvalidUserId() {
         assertThrows(UserNotFoundException.class, () -> itemController.update(1L, itemDto, 1L));
     }
 
     @Test
-    void updateByWrongUserTest() {
+    void update_shouldReturnExceptionWhenInvalidItemId() {
         userController.create(userDto);
         itemController.create(1L, itemDto);
         assertThrows(ItemNotFoundException.class,
@@ -123,7 +116,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void deleteTest() {
+    void delete_shouldReturnValidListSize() {
         userController.create(userDto);
         itemController.create(1L, itemDto);
         assertEquals(1, itemController.getAllItemsByUser(1L).size());
@@ -132,14 +125,14 @@ class ItemControllerTest {
     }
 
     @Test
-    void searchTest() {
+    void search_shouldReturnValidSize() {
         userController.create(userDto);
         itemController.create(1L, itemDto);
         assertEquals(1, itemController.search("Desc").size());
     }
 
     @Test
-    void searchEmptyTextTest() {
+    void search_shouldReturnEmptyListWhenTextIsEmpty() {
         userController.create(userDto);
         itemController.create(1L, itemDto);
         assertEquals(new ArrayList<ItemDto>(), itemController.search(""));
@@ -166,8 +159,8 @@ class ItemControllerTest {
     }
 
     @Test
-    void createCommentTest() {
-        UserDto user = userController.create(userDto);
+    void addComment_shouldReturnValidCommentListSize() {
+        userController.create(userDto);
         ItemDto item = itemController.create(1L, itemDto);
         UserDto user2 = userController.create(userDto.toBuilder().email("email2@mail.com").build());
         bookingController.create(user2.getId(), BookingDto.builder()
@@ -180,20 +173,20 @@ class ItemControllerTest {
     }
 
     @Test
-    void createCommentByWrongUser() {
+    void addComment_shouldReturnExceptionWhenInvalidUserId() {
         assertThrows(UserNotFoundException.class, () -> itemController.addComment(1L, comment, 1L));
     }
 
     @Test
-    void createCommentToWrongItem() {
-        UserDto user = userController.create(userDto);
+    void addComment_shouldReturnException() {
+        userController.create(userDto);
         assertThrows(ItemNotFoundException.class, () -> itemController.addComment(1L, comment, 1L));
-        ItemDto item = itemController.create(1L, itemDto);
+        itemController.create(1L, itemDto);
         assertThrows(BadRequestException.class, () -> itemController.addComment(1L, comment, 1L));
     }
 
     @Test
-    void getAllWithWrongFrom() {
+    void getAllItemsByUser_shouldReturnExceptionWhenWhenInvalidUserId() {
         assertThrows(UserNotFoundException.class, () -> itemController.getAllItemsByUser(1L));
     }
 }

@@ -28,26 +28,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class ItemRequestControllerWithMockMvcTest {
     @Autowired
     private ObjectMapper mapper;
-
     @MockBean
     private ItemRequestService itemRequestService;
-
     @Autowired
     private MockMvc mvc;
-
     private ItemRequestDto itemRequestDto;
 
     @BeforeEach
     void init() {
-        itemRequestDto = ItemRequestDto
-                .builder()
+        itemRequestDto = ItemRequestDto.builder()
                 .id(1L)
-                .description("item request description")
-                .build();
+                .description("item request description").build();
     }
 
     @Test
-    void createTest() throws Exception {
+    void create() throws Exception {
         when(itemRequestService.create(anyLong(), any()))
                 .thenReturn(itemRequestDto);
         mvc.perform(post("/requests")
@@ -61,7 +56,7 @@ class ItemRequestControllerWithMockMvcTest {
     }
 
     @Test
-    void getAllByUserTest() throws Exception {
+    void getAllRequestsByOwner() throws Exception {
         when(itemRequestService.getAllRequestsByOwner(anyLong()))
                 .thenReturn(List.of(itemRequestDto));
         mvc.perform(get("/requests")
@@ -74,7 +69,7 @@ class ItemRequestControllerWithMockMvcTest {
     }
 
     @Test
-    void getAllTest() throws Exception {
+    void getAll() throws Exception {
         when(itemRequestService.getAllRequests(anyLong(), anyInt(), anyInt()))
                 .thenReturn(List.of(itemRequestDto));
         mvc.perform(get("/requests/all")
@@ -87,7 +82,7 @@ class ItemRequestControllerWithMockMvcTest {
     }
 
     @Test
-    void getByIdTest() throws Exception {
+    void getById() throws Exception {
         when(itemRequestService.getById(anyLong(), anyLong()))
                 .thenReturn(itemRequestDto);
         mvc.perform(get("/requests/1")

@@ -14,8 +14,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static ru.practicum.shareit.booking.Status.APPROVED;
 import static ru.practicum.shareit.booking.Status.WAITING;
 
@@ -63,7 +62,7 @@ class BookingRepositoryTest {
         itemRepository.save(item);
         userRepository.save(user2);
         bookingRepository.save(booking);
-        assertThat(bookingRepository.findAllByItemOwnerOrderByStartDesc(user, PageRequest.ofSize(10)).stream().count(), equalTo(1L));
+        assertEquals(1, bookingRepository.findAllByItemOwnerOrderByStartDesc(user, PageRequest.ofSize(10)).size());
     }
 
     @Test
@@ -72,7 +71,7 @@ class BookingRepositoryTest {
         itemRepository.save(item);
         userRepository.save(user2);
         bookingRepository.save(booking);
-        assertThat(bookingRepository.findAllByBookerOrderByStartDesc(user2, PageRequest.ofSize(10)).stream().count(), equalTo(1L));
+        assertEquals(1, bookingRepository.findAllByBookerOrderByStartDesc(user2, PageRequest.ofSize(10)).size());
     }
 
     @Test
@@ -82,9 +81,8 @@ class BookingRepositoryTest {
         userRepository.save(user2);
         booking.setStatus(APPROVED);
         bookingRepository.save(booking);
-        assertThat(bookingRepository.findAllByBookerIdAndItemIdAndStatusEqualsAndEndIsBefore(user2.getId(),
-                        item.getId(), APPROVED, LocalDateTime.of(2023, 3, 10, 10, 10)).size(),
-                equalTo(1));
+        assertEquals(1, bookingRepository.findAllByBookerIdAndItemIdAndStatusEqualsAndEndIsBefore(user2.getId(),
+                item.getId(), APPROVED, LocalDateTime.of(2023, 3, 10, 10, 10)).size());
     }
 
     @Test
@@ -93,7 +91,6 @@ class BookingRepositoryTest {
         itemRepository.save(item);
         userRepository.save(user2);
         bookingRepository.save(booking);
-        assertThat(bookingRepository.findAllByItemOwnerAndStatusEqualsOrderByStartDesc(user, WAITING, PageRequest.ofSize(10))
-                .stream().count(), equalTo(1L));
+        assertEquals(1, bookingRepository.findAllByItemOwnerAndStatusEqualsOrderByStartDesc(user, WAITING, PageRequest.ofSize(10)).size());
     }
 }

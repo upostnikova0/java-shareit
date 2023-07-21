@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ItemRepositoryTests {
+class ItemRepositoryTest {
     @Autowired
     private ItemRepository itemRepository;
 

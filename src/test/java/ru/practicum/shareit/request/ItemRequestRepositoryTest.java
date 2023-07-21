@@ -25,7 +25,7 @@ class ItemRequestRepositoryTest {
     private UserRepository userRepository;
 
     @Test
-    void findAllByRequesterIdOrderByCreatedA() {
+    void findAllByRequesterIdOrderByCreated() {
         User user = userRepository.save(User.builder().name("name").email("email@email.com").build());
         itemRequestRepository.save(ItemRequest.builder().description("description").requester(user)
                 .created(LocalDateTime.now()).build());

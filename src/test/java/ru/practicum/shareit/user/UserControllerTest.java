@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class UserControllerTest {
     @Autowired
     private UserController userController;
-
     private UserDto user;
     private UserDto tempUser;
 
@@ -34,13 +33,13 @@ class UserControllerTest {
     }
 
     @Test
-    void createTest() {
+    void create() {
         UserDto userDto = userController.create(user);
         assertEquals(userDto.getId(), userController.getById(userDto.getId()).getId());
     }
 
     @Test
-    void updateTest() {
+    void update() {
         userController.create(user);
         UserDto userDto = user.toBuilder().name("update name").email("update@email.com").build();
         userController.update(userDto, 1L);
@@ -48,23 +47,20 @@ class UserControllerTest {
     }
 
     @Test
-    void updateByWrongUserTest() {
+    void update_shouldReturnExceptionWhenInvalidUserId() {
         assertThrows(UserNotFoundException.class, () -> userController.update(user, 1L));
     }
 
     @Test
     void update_shouldTReturnExceptionWhenEmailAlreadyExist() {
         userController.create(user);
-
         userController.create(tempUser);
-
         tempUser.setEmail(user.getEmail());
-
         assertThrows(EmailAlreadyExistException.class, () -> userController.update(tempUser, 2L));
     }
 
     @Test
-    void deleteTest() {
+    void delete() {
         UserDto userDto = userController.create(user);
         assertEquals(1, userController.getAll().size());
         userController.delete(userDto.getId());
@@ -72,7 +68,7 @@ class UserControllerTest {
     }
 
     @Test
-    void getByWrongIdTest() {
+    void getById_shouldReturnExceptionWhenInvalidUserId() {
         assertThrows(UserNotFoundException.class, () -> userController.getById(1L));
     }
 }

@@ -27,7 +27,6 @@ class ItemRequestControllerTest {
     private ItemController itemController;
     private ItemRequestDto itemRequestDto;
     private UserDto userDto;
-    private ItemDto itemDto;
 
     @BeforeEach
     void init() {
@@ -84,7 +83,7 @@ class ItemRequestControllerTest {
                 .name("tempUser")
                 .email("temp@mail.ru").build();
 
-        itemDto = ItemDto.builder()
+        ItemDto itemDto = ItemDto.builder()
                 .name("itemName")
                 .description("itemDesc")
                 .available(true)

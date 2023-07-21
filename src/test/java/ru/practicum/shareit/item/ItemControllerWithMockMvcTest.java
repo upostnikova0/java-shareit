@@ -46,7 +46,7 @@ class ItemControllerWithMockMvcTest {
     }
 
     @Test
-    void getAll() throws Exception {
+    void getAllItemsByUser() throws Exception {
         when(itemService.getAllItemsByUser(anyLong()))
                 .thenReturn(List.of(itemDto));
         mvc.perform(get("/items")
@@ -100,7 +100,7 @@ class ItemControllerWithMockMvcTest {
     }
 
     @Test
-    void search() throws Exception {
+    void searchItems() throws Exception {
         when(itemService.searchItems(anyString()))
                 .thenReturn(List.of(itemDto));
         mvc.perform(get("/items/search?text='name'")
@@ -113,7 +113,7 @@ class ItemControllerWithMockMvcTest {
     }
 
     @Test
-    void createComment() throws Exception {
+    void addComment() throws Exception {
         when(itemService.addComment(anyLong(), any(), anyLong()))
                 .thenReturn(commentDto);
         mvc.perform(post("/items/1/comment")
