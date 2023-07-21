@@ -12,6 +12,7 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -20,6 +21,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @WebMvcTest(controllers = ItemRequestController.class)
 class ItemRequestControllerWithMockMvcTest {
@@ -94,5 +100,35 @@ class ItemRequestControllerWithMockMvcTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(itemRequestDto)));
+    }
+
+    @Test
+    public void getAllRequests() throws Exception {
+
+        ItemRequestDto responseDto1 = ItemRequestDto.builder()
+                .id(1L)
+                .description("itemdesc").build();
+
+        ItemRequestDto responseDto2 = ItemRequestDto.builder()
+                .id(2L)
+                .description("item2desc").build();
+
+        List<ItemRequestDto> responseList = Arrays.asList(responseDto1, responseDto2);
+
+        when(itemRequestService.getAllRequests(anyLong(), anyInt(), anyInt()))
+                .thenReturn(responseList);
+
+        mvc.perform(get("/requests/all")
+                        .header("X-Sharer-User-Id", 1L)
+                        .param("from", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[0].description", is("itemdesc")))
+                .andExpect(jsonPath("$[1].id", is(2)))
+                .andExpect(jsonPath("$[1].description", is("item2desc")));
+
+        verify(itemRequestService).getAllRequests(1L, 1, 10);
     }
 }
