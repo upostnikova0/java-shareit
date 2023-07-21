@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ItemControllerTests {
+class ItemControllerTest {
     @Autowired
     private ItemController itemController;
 
@@ -143,6 +143,21 @@ class ItemControllerTests {
         userController.create(userDto);
         itemController.create(1L, itemDto);
         assertEquals(new ArrayList<ItemDto>(), itemController.search(""));
+    }
+
+    @Test
+    void getAllItemsByUser_shouldReturnValidListSize() {
+        userController.create(userDto);
+        itemController.create(1L, itemDto);
+
+        ItemDto tempItemDto = ItemDto.builder()
+                .name("tempItemDto")
+                .description("tempItemDtoDescription")
+                .available(true).build();
+
+        itemController.create(1L, tempItemDto);
+
+        assertEquals(2, itemController.getAllItemsByUser(1L).size());
     }
 
     @Test

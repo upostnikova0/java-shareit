@@ -96,16 +96,6 @@ public class ItemServiceImpl implements ItemService {
 
         ItemDto itemDto = itemMapper.toItemDto(item);
 
-        List<Comment> comments = commentRepository.findAllByItemId(itemId);
-
-        if (!comments.isEmpty()) {
-            itemDto.setComments(
-                    comments
-                            .stream()
-                            .map(commentMapper::toCommentDto)
-                            .collect(Collectors.toList()));
-        }
-
         itemDto.setComments(commentRepository.findAllByItemId(itemId)
                 .stream()
                 .map(commentMapper::toCommentDto)

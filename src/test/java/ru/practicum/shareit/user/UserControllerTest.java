@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.exception.EmailAlreadyExistException;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,6 +19,7 @@ class UserControllerTest {
     private UserController userController;
 
     private UserDto user;
+    private UserDto tempUser;
 
     @BeforeEach
     void init() {
@@ -25,6 +27,10 @@ class UserControllerTest {
                 .name("name")
                 .email("user@email.com")
                 .build();
+
+        tempUser = UserDto.builder()
+                .name("Temp")
+                .email("temp@mail.ru").build();
     }
 
     @Test
@@ -44,6 +50,17 @@ class UserControllerTest {
     @Test
     void updateByWrongUserTest() {
         assertThrows(UserNotFoundException.class, () -> userController.update(user, 1L));
+    }
+
+    @Test
+    void update_shouldTReturnExceptionWhenEmailAlreadyExist() {
+        userController.create(user);
+
+        userController.create(tempUser);
+
+        tempUser.setEmail(user.getEmail());
+
+        assertThrows(EmailAlreadyExistException.class, () -> userController.update(tempUser, 2L));
     }
 
     @Test
