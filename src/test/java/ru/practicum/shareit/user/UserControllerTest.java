@@ -9,6 +9,8 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.exception.EmailAlreadyExistException;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 
+import javax.validation.ValidationException;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -36,6 +38,13 @@ class UserControllerTest {
     void create() {
         UserDto userDto = userController.create(user);
         assertEquals(userDto.getId(), userController.getById(userDto.getId()).getId());
+    }
+
+    @Test
+    void create_shouldReturnException() {
+        user.setName("");
+
+        assertThrows(ValidationException.class, () -> userController.create(user));
     }
 
     @Test
