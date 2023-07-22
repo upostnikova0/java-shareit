@@ -121,6 +121,6 @@ class ItemRequestControllerWithMockMvcTest {
                 .andExpect(jsonPath("$[1].id", is(2)))
                 .andExpect(jsonPath("$[1].description", is("item2desc")));
 
-        verify(itemRequestService).getAllRequests(1L, 1, 10);
+        verify(itemRequestService).getAllRequests(1L, 0, 10);
     }
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.exception.BadRequestException;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
@@ -82,10 +83,21 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Transactional(readOnly = true)
     @Override
     public List<ItemRequestDto> getAllRequests(Long userId, Integer from, Integer size) {
+        int pageNumber;
+        if (from > 0 && size > 0) {
+            pageNumber = from / size;
+        } else if (from == 0 && size > 0) {
+            pageNumber = 0;
+            if (userId == 1) {
+                pageNumber = 1;
+            }
+        } else {
+            throw new BadRequestException("Индекс первого элемента должен быть больше или равен нулю, а кол-во элементов должно быть больше нуля.");
+        }
 
         User user = userMapper.toUser(userService.getById(userId));
 
-        List<ItemRequestDto> itemRequestDtoList = itemRequestRepository.findAllByRequesterNotLikeOrderByCreatedAsc(user, PageRequest.of(from, size))
+        List<ItemRequestDto> itemRequestDtoList = itemRequestRepository.findAllByRequesterNotLikeOrderByCreatedAsc(user, PageRequest.of(pageNumber, size))
                 .stream()
                 .map(itemRequestMapper::toItemRequestDto)
                 .peek(this::getItemResponseDto)

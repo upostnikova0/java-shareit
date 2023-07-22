@@ -14,7 +14,7 @@ import static ru.practicum.shareit.item.ItemController.xSharerUserId;
 @RestController
 @RequestMapping(path = "/bookings")
 public class BookingController {
-    BookingService bookingService;
+    private final BookingService bookingService;
 
     @Autowired
     public BookingController(BookingService bookingService) {

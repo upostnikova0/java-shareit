@@ -36,19 +36,7 @@ public class ItemRequestController {
     public List<ItemRequestDto> getAllRequests(@RequestHeader(xSharerUserId) Long userId,
                                                @RequestParam(defaultValue = "0") Integer from,
                                                @RequestParam(defaultValue = "10") Integer size) {
-        int pageNumber;
-        if (from > 0 && size > 0) {
-            pageNumber = from / size;
-        } else if (from == 0 && size > 0) {
-            pageNumber = 0;
-            if (userId == 1) {
-                pageNumber = 1;
-            }
-        } else {
-            throw new BadRequestException("Индекс первого элемента должен быть больше или равен нулю, а кол-во элементов должно быть больше нуля.");
-        }
-
-        return itemRequestService.getAllRequests(userId, pageNumber, size);
+        return itemRequestService.getAllRequests(userId, from, size);
     }
 
     @GetMapping("/{requestId}")
