@@ -9,7 +9,7 @@ import java.util.List;
 public interface ItemService {
     ItemDto create(Long userId, ItemDto itemDto);
 
-    ItemDto getById(Long id, Long ownerId);
+    ItemDto getById(Long itemId, Long ownerId);
 
     List<ItemDto> getAllItemsByUser(Long userId);
 

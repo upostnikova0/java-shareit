@@ -88,9 +88,6 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             pageNumber = from / size;
         } else if (from == 0 && size > 0) {
             pageNumber = 0;
-            if (userId == 1) {
-                pageNumber = 1;
-            }
         } else {
             throw new BadRequestException("Индекс первого элемента должен быть больше или равен нулю, а кол-во элементов должно быть больше нуля.");
         }

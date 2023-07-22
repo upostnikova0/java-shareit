@@ -80,4 +80,22 @@ class UserControllerTest {
     void getById_shouldReturnExceptionWhenInvalidUserId() {
         assertThrows(UserNotFoundException.class, () -> userController.getById(1L));
     }
+
+    @Test
+    void getById() {
+        UserDto saveUser = userController.create(user);
+        assertEquals(1L, userController.getById(saveUser.getId()).getId());
+    }
+
+    @Test
+    void getAll() {
+        UserDto secondUser = UserDto.builder()
+                .name("second")
+                .email("second@mail.ru").build();
+
+        userController.create(user);
+        userController.create(secondUser);
+
+        assertEquals(2, userController.getAll().size());
+    }
 }
