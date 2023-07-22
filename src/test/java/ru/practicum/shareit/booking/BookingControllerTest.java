@@ -104,6 +104,17 @@ class BookingControllerTest {
     }
 
     @Test
+    void update() {
+        UserDto owner = userController.create(userDto);
+        itemController.create(owner.getId(), itemDto);
+        UserDto booker = userController.create(userDto1);
+        BookingDto booking = bookingController.create(booker.getId(), bookingDto);
+        assertEquals(1L, bookingController.getById(booker.getId(), booking.getId()).getId());
+        bookingController.updateBookingStatus(owner.getId(), booking.getId(), true);
+        assertEquals(Status.APPROVED, bookingController.getById(booker.getId(), booking.getId()).getStatus());
+    }
+
+    @Test
     void updateBookingStatus_shouldReturnExceptionWhenWrongUserId() {
         assertThrows(UserNotFoundException.class, () -> bookingController.updateBookingStatus(1L, 1L, true));
     }
