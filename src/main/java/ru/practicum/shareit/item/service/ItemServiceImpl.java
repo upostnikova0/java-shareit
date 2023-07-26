@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -17,6 +16,9 @@ import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestMapper;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.service.ItemRequestService;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.exception.UserNotFoundException;
 import ru.practicum.shareit.user.model.User;
@@ -25,6 +27,7 @@ import ru.practicum.shareit.user.service.UserService;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -37,47 +40,59 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
     private final UserService userService;
     private final BookingService bookingService;
+    private final ItemRequestService itemRequestService;
     private final BookingMapper bookingMapper;
     private final UserMapper userMapper;
     private final CommentMapper commentMapper;
     private final ItemMapper itemMapper;
+    private final ItemRequestMapper itemRequestMapper;
 
-    public ItemServiceImpl(@Qualifier("itemRepository") ItemRepository itemRepository,
-                           @Qualifier("commentRepository") CommentRepository commentRepository,
+    public ItemServiceImpl(ItemRepository itemRepository,
+                           CommentRepository commentRepository,
                            UserService userService,
                            BookingService bookingService,
+                           ItemRequestService itemRequestService,
                            BookingMapper bookingMapper,
                            UserMapper userMapper,
                            CommentMapper commentMapper,
-                           ItemMapper itemMapper) {
+                           ItemMapper itemMapper,
+                           ItemRequestMapper itemRequestMapper) {
         this.itemRepository = itemRepository;
         this.commentRepository = commentRepository;
         this.userService = userService;
         this.bookingService = bookingService;
+        this.itemRequestService = itemRequestService;
         this.bookingMapper = bookingMapper;
         this.userMapper = userMapper;
         this.commentMapper = commentMapper;
         this.itemMapper = itemMapper;
+        this.itemRequestMapper = itemRequestMapper;
     }
 
     @Transactional
     @Override
     public ItemDto create(Long userId, ItemDto itemDto) {
-        User user = userMapper.toUser(userService.getUser(userId));
-        Item item = itemRepository.save(itemMapper.toItem(itemDto, user));
+        User user = userMapper.toUser(userService.getById(userId));
+        Item item = itemMapper.toItem(itemDto, user);
 
-        log.info("Вещь {} успешно добавлена.", item);
+        if (itemDto.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestMapper.toItemRequest(itemRequestService.getById(itemDto.getRequestId(), userId));
+            item.setRequest(itemRequest);
+        }
+
+        log.info("Добавлена вещь {}", item);
+        itemRepository.save(item);
         return itemMapper.toItemDto(item);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public ItemDto getItem(Long itemId, Long userId) {
+    public ItemDto getById(Long itemId, Long userId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new ItemNotFoundException("Не найдена вещь с id: " + itemId)
         );
 
-        userService.getUser(userId);
+        userService.getById(userId);
 
         ItemDto itemDto = itemMapper.toItemDto(item);
 
@@ -109,9 +124,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<ItemDto> getAllItemsByUser(Long userId) {
-        userService.getUser(userId);
-        Collection<ItemDto> allItemsByUser = itemRepository.findAllByOwnerId(userId)
+    public List<ItemDto> getAllItemsByUser(Long userId) {
+        userService.getById(userId);
+        List<ItemDto> allItemsByUser = itemRepository.findAllByOwnerId(userId)
                 .stream()
                 .map(itemMapper::toItemDto)
                 .peek(
@@ -143,7 +158,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public ItemDto update(Long userId, ItemDto itemDto, Long itemId) {
-        User user = userMapper.toUser(userService.getUser(userId));
+        User user = userMapper.toUser(userService.getById(userId));
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new ItemNotFoundException(String.format("Не найдена вещь с ID %d", itemId))
         );
@@ -170,7 +185,7 @@ public class ItemServiceImpl implements ItemService {
         Item newItem = itemMapper.toItem(itemDto, user);
         itemRepository.save(newItem);
 
-        log.info("Вещь {} успешно обновлена.", newItem);
+        log.info("Обновлена вещь {}", newItem);
         return itemMapper.toItemDto(newItem);
     }
 
@@ -196,7 +211,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public CommentDto addComment(long userId, CommentDto commentDto, long itemId) {
-        User user = userMapper.toUser(userService.getUser(userId));
+        User user = userMapper.toUser(userService.getById(userId));
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new ItemNotFoundException(String.format("Вещь с ID %d не найдена.", itemId))
         );

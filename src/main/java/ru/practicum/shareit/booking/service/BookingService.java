@@ -6,7 +6,6 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,9 +14,9 @@ public interface BookingService {
 
     BookingDto getById(Long userId, Long id);
 
-    Collection<BookingDto> getAllBookingsByUser(Long userId, State value);
+    List<BookingDto> getAllBookingsByUser(Long userId, State value, Integer from, Integer size);
 
-    Collection<BookingDto> getAllBookingsByOwner(Long userId, State value);
+    List<BookingDto> getAllBookingsByOwner(Long userId, State value, Integer from, Integer size);
 
     BookingDto updateBookingStatus(Long userId, Long id, Boolean value);
 

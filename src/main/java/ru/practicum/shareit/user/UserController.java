@@ -8,7 +8,7 @@ import ru.practicum.shareit.user.service.Create;
 import ru.practicum.shareit.user.service.Update;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -26,12 +26,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public UserDto getUserById(@PathVariable Long id) {
-        return userService.getUser(id);
+    public UserDto getById(@PathVariable Long id) {
+        return userService.getById(id);
     }
 
     @GetMapping
-    public Collection<UserDto> getAll() {
+    public List<UserDto> getAll() {
         return userService.getAll();
     }
 

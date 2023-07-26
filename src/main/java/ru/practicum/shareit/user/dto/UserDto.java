@@ -1,6 +1,6 @@
 package ru.practicum.shareit.user.dto;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.user.service.Create;
 import ru.practicum.shareit.user.service.Update;
@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 @Data
-@AllArgsConstructor
+@Builder(toBuilder = true)
 public class UserDto {
     private Long id;
     @NotBlank(message = "Имя не может быть пустым.")
