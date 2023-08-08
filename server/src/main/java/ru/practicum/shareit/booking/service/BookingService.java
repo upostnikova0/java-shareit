@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.model.Booking;
 
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookingService {
-    BookingDto create(Long userId, BookingDto bookingDtoFromUser);
+    BookingDto create(Long userId, BookingShortDto bookingShortDto);
 
     BookingDto getById(Long userId, Long id);
 

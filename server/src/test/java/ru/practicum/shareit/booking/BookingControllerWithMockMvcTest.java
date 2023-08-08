@@ -58,17 +58,17 @@ class BookingControllerWithMockMvcTest {
 
         bookingDto = BookingDto.builder()
                 .id(1L)
-                .itemId(itemDto.getId())
                 .start(LocalDateTime.now().plusMinutes(1))
-                .end(LocalDateTime.now().plusDays(2)).build();
+                .end(LocalDateTime.now().plusDays(2))
+                .booker(userMapper.toUser(userDto))
+                .item(itemMapper.toItem(itemDto)).build();
 
         bookingShortDto = BookingShortDto.builder()
                 .id(1L)
                 .start(LocalDateTime.now().plusMinutes(1))
                 .end(LocalDateTime.now().plusDays(2))
                 .itemId(1L)
-                .bookerId(2L)
-                .status(Status.WAITING).build();
+                .bookerId(2L).build();
     }
 
     @Test

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.BookingMapper;
@@ -14,6 +15,7 @@ import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.item.comment.dto.CommentDto;
 import ru.practicum.shareit.item.comment.model.Comment;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemShortDto;
 import ru.practicum.shareit.item.exceptions.ItemNotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.ItemRequestMapper;
@@ -68,18 +70,19 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public ItemDto create(Long userId, ItemDto itemDto) {
+    public ItemShortDto create(Long userId, ItemShortDto itemShortDto) {
         User user = userMapper.toUser(userService.getById(userId));
-        Item item = itemMapper.toItem(itemDto, user);
+        Item item = itemMapper.toItem(itemShortDto);
+        item.setOwner(user);
 
-        if (itemDto.getRequestId() != null) {
-            ItemRequest itemRequest = itemRequestMapper.toItemRequest(itemRequestService.getById(itemDto.getRequestId(), userId));
+        if (itemShortDto.getRequestId() != null) {
+            ItemRequest itemRequest = itemRequestMapper.toItemRequest(itemRequestService.getById(itemShortDto.getRequestId(), userId));
             item.setRequest(itemRequest);
         }
 
         log.info("Добавлена вещь {}", item);
         itemRepository.save(item);
-        return itemMapper.toItemDto(item);
+        return itemMapper.toItemShortDto(item);
     }
 
     @Transactional(readOnly = true)
@@ -121,9 +124,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> getAllItemsByUser(Long userId) {
+    public List<ItemDto> getAllItemsByUser(Long userId, Integer from, Integer size) {
         userService.getById(userId);
-        List<ItemDto> allItemsByUser = itemRepository.findAllByOwnerId(userId)
+        List<ItemDto> allItemsByUser = itemRepository.findAllByOwnerId(userId, PageRequest.of(from / size, size))
                 .stream()
                 .sorted(Comparator.comparing(Item::getId))
                 .map(itemMapper::toItemDto)
@@ -155,7 +158,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public ItemDto update(Long userId, ItemDto itemDto, Long itemId) {
+    public ItemShortDto update(Long userId, ItemShortDto itemShortDto, Long itemId) {
         User user = userMapper.toUser(userService.getById(userId));
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new ItemNotFoundException(String.format("Не найдена вещь с ID %d", itemId))
@@ -166,25 +169,26 @@ public class ItemServiceImpl implements ItemService {
             throw new UserNotFoundException("Невозможно обновить вещь, т.к. она пренадлежит другому пользователю.");
         }
 
-        if (itemDto.getName() == null) {
-            itemDto.setName(item.getName());
+        if (itemShortDto.getName() == null) {
+            itemShortDto.setName(item.getName());
         }
 
-        if (itemDto.getDescription() == null) {
-            itemDto.setDescription(item.getDescription());
+        if (itemShortDto.getDescription() == null) {
+            itemShortDto.setDescription(item.getDescription());
         }
 
-        if (itemDto.getAvailable() == null) {
-            itemDto.setAvailable(item.getAvailable());
+        if (itemShortDto.getAvailable() == null) {
+            itemShortDto.setAvailable(item.getAvailable());
         }
 
-        itemDto.setId(itemId);
+        itemShortDto.setId(itemId);
 
-        Item newItem = itemMapper.toItem(itemDto, user);
+        Item newItem = itemMapper.toItem(itemShortDto);
+        newItem.setOwner(user);
         itemRepository.save(newItem);
 
         log.info("Обновлена вещь {}", newItem);
-        return itemMapper.toItemDto(newItem);
+        return itemMapper.toItemShortDto(newItem);
     }
 
     @Transactional
@@ -195,14 +199,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public Collection<ItemDto> searchItems(String text) {
+    public Collection<ItemShortDto> searchItems(String text, Integer from, Integer size) {
         if (text.isBlank()) {
             return new ArrayList<>();
         }
 
-        return itemRepository.searchItems(text)
+        return itemRepository.searchItems(text, PageRequest.of(from / size, size))
                 .stream()
-                .map(itemMapper::toItemDto)
+                .map(itemMapper::toItemShortDto)
                 .collect(Collectors.toList());
     }
 

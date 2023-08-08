@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.item.comment.model.Comment;
@@ -41,13 +42,14 @@ class ItemRepositoryTest {
                         .name("name")
                         .email("email@email.com").build()
         );
+
         itemRepository.save(Item.builder()
                 .name("name")
                 .description("description")
                 .owner(user)
                 .available(true)
                 .build());
-        List<Item> items = itemRepository.searchItems("desc");
+        List<Item> items = itemRepository.searchItems("desc", Pageable.ofSize(10));
         assertThat(items.stream().count(), equalTo(1L));
     }
 
@@ -55,7 +57,7 @@ class ItemRepositoryTest {
     void findAllByOwnerIdTest() {
         User user = userRepository.save(User.builder().name("name").email("email@email.com").build());
         itemRepository.save(Item.builder().name("name").description("description").available(true).owner(user).build());
-        List<Item> items = itemRepository.findAllByOwnerId(user.getId());
+        List<Item> items = itemRepository.findAllByOwnerId(user.getId(), Pageable.ofSize(10));
         assertThat(items.stream().count(), equalTo(1L));
     }
 

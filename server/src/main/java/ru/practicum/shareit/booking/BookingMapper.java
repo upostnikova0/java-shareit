@@ -12,9 +12,9 @@ public class BookingMapper {
                 .id(booking.getId())
                 .start(booking.getStart())
                 .end(booking.getEnd())
+                .item(booking.getItem())
                 .booker(booking.getBooker())
                 .status(booking.getStatus())
-                .item(booking.getItem())
                 .build();
     }
 
@@ -23,9 +23,9 @@ public class BookingMapper {
                 .id(bookingDto.getId())
                 .start(bookingDto.getStart())
                 .end(bookingDto.getEnd())
+                .item(bookingDto.getItem())
                 .booker(bookingDto.getBooker())
                 .status(bookingDto.getStatus())
-                .item(bookingDto.getItem())
                 .build();
     }
 
@@ -36,7 +36,14 @@ public class BookingMapper {
                 .end(booking.getEnd())
                 .itemId(booking.getItem().getId())
                 .bookerId(booking.getBooker().getId())
-                .status(booking.getStatus())
+                .build();
+    }
+
+    public Booking toBooking(BookingShortDto bookingShortDto) {
+        return Booking.builder()
+                .id(bookingShortDto.getId())
+                .start(bookingShortDto.getStart())
+                .end(bookingShortDto.getEnd())
                 .build();
     }
 }

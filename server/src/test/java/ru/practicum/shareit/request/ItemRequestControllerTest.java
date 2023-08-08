@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.ItemController;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemShortDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -83,14 +83,14 @@ class ItemRequestControllerTest {
                 .name("tempUser")
                 .email("temp@mail.ru").build();
 
-        ItemDto itemDto = ItemDto.builder()
+        ItemShortDto itemShortDto = ItemShortDto.builder()
                 .name("itemName")
                 .description("itemDesc")
                 .available(true)
                 .requestId(itemRequestDto1.getId()).build();
 
         UserDto owner = userController.create(tempUser);
-        itemController.create(owner.getId(), itemDto);
+        itemController.create(owner.getId(), itemShortDto);
 
         assertEquals(1, itemRequestController.getAllRequests(owner.getId(), 1, 10).size());
     }

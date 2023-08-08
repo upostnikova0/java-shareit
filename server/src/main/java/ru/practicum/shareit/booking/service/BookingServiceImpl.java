@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.exception.BookingNotFoundException;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.ItemRepository;
@@ -50,19 +51,16 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional
     @Override
-    public BookingDto create(Long userId, BookingDto bookingDto) {
+    public BookingDto create(Long userId, BookingShortDto bookingShortDto) {
         User booker = userMapper.toUser(userService.getById(userId));
-        isBookingValid(bookingDto);
-        Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(
-                () -> new ItemNotFoundException(String.format("Вещь с ID %d не найдена.", bookingDto.getItemId()))
-        );
+        Item item = isBookingValid(bookingShortDto);
 
         if (item.getOwner().getId().equals(userId)) {
             log.warn("Владелец вещи пытается забронировать собственную вещь.");
             throw new BookingNotFoundException("Нельзя забронировать собственную вещь.");
         }
 
-        Booking booking = bookingMapper.toBooking(bookingDto);
+        Booking booking = bookingMapper.toBooking(bookingShortDto);
         booking.setBooker(booker);
         booking.setItem(item);
         booking.setStatus(WAITING);
@@ -203,12 +201,12 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findAllByBookerIdAndItemIdAndStatusEqualsAndEndIsBefore(userId, itemId, APPROVED, LocalDateTime.now());
     }
 
-    private void isBookingValid(BookingDto bookingDto) {
-        Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(
-                () -> new ItemNotFoundException(String.format("Вещь с ID %d не найдена.", bookingDto.getItemId()))
+    private Item isBookingValid(BookingShortDto bookingShortDto) {
+        Item item = itemRepository.findById(bookingShortDto.getItemId()).orElseThrow(
+                () -> new ItemNotFoundException(String.format("Вещь с ID %d не найдена.", bookingShortDto.getItemId()))
         );
-        LocalDateTime start = bookingDto.getStart();
-        LocalDateTime end = bookingDto.getEnd();
+        LocalDateTime start = bookingShortDto.getStart();
+        LocalDateTime end = bookingShortDto.getEnd();
 
         if (!item.getAvailable()) {
             log.warn("Вещь недоступна для бронирования.");
@@ -219,5 +217,7 @@ public class BookingServiceImpl implements BookingService {
             log.warn("Невалидные даты бронирования.");
             throw new ValidationException("Дата завершения бронирования должна быть позже даты начала бронирования.");
         }
+
+        return item;
     }
 }
