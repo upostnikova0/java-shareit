@@ -21,6 +21,7 @@ public class ItemRequest {
     private Long id;
     @Column(length = 1000, nullable = false)
     private String description;
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "requester_id", referencedColumnName = "id")
     private User requester;

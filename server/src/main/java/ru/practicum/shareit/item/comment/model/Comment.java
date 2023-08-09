@@ -23,9 +23,11 @@ public class Comment {
     private Long id;
     @Column(name = "text", nullable = false)
     private String text;
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
+    @ToString.Exclude
     @OneToOne
     @JoinColumn(name = "author_id", nullable = false)
     private User author;

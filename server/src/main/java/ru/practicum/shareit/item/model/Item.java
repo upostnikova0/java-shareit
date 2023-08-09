@@ -23,11 +23,13 @@ public class Item {
     private String name;
     @Column(name = "description", nullable = false)
     private String description;
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id", nullable = false)
     private User owner;
     @Column(name = "is_available", nullable = false)
     private Boolean available;
+    @ToString.Exclude
     @OneToOne
     @JoinColumn(name = "request_id", referencedColumnName = "id")
     ItemRequest request;
